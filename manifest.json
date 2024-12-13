@@ -1,0 +1,21 @@
+{
+	"manifest_version": 2,
+	"name": "BDO Time Conversion",
+	"version": "1.0",
+	
+	"icons": {
+		"48": "icons/48.png",
+		"96": "icons/96.png",
+		"256": "icons/256.png"
+	},
+	  
+  
+	"description": "Attempts to convert timestamps on the playblackdesert website to your local time.",
+	"content_scripts": [
+	  {
+		"matches": ["*://*.playblackdesert.com/*"],
+		"js": ["time.js"]
+	  }
+	]
+  }
+  
