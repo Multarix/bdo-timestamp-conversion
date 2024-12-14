@@ -1,7 +1,4 @@
-// Attempts to convert this: "Dec 13, 2024 (Fri) 23:00 (PST)""
-
-var regex = /(\w+) (\d+), (\d+) \(\w+\) (\d+):(\d+) \((\w+)\)/g
-
+var allElements = document.getElementsByTagName("*");
 
 // All the Ameritard timezones and dayshit timezones (Abolish DST, it's fucking useless)
 var timezoneOffsets = {
@@ -31,20 +28,29 @@ var shortMonths = [
 ];
 
 
-function buildTimestamp(result){
+function buildLongTimestamp(result){
 	const [_full, month, date, year, hour, minute, zone] = result;
-	const monthNumber = shortMonths.indexOf(month) + 1;
+	const triMonth = month.slice(0, 3);
+	
+	const monthNumber = shortMonths.indexOf(triMonth) + 1;
 	const offset = timezoneOffsets[zone];
 	
+	const monthString = (monthNumber < 10) ? `0${monthNumber}` : monthNumber.toString();
+	const dateString = (date.length < 2) ? `0${date}` : date.toString();
+	const hourString = (hour.length < 2) ? `0${hour}` : hour.toString();
+	const minuteString = (minute.length < 2) ? `0${minute}` : minute.toString();
+	
+	
 	if(!offset) return "";
-	return `${year}-${monthNumber}-${date}T${hour}:${minute}:00.000${offset}`;
+	const timestamp = `${year}-${monthString}-${dateString}T${hourString}:${minuteString}:00.000${offset}`;
+	return timestamp;
 }
 
 
 /**
  * @param {Date} dateTime
  */
-function buildReplacement(dateTime){
+function buildReplacementLongTimestamp(dateTime){
 	const month = shortMonths[dateTime.getMonth()];
 	const date = dateTime.getDate();
 	const year = dateTime.getFullYear();
@@ -59,20 +65,24 @@ function buildReplacement(dateTime){
 }
 
 
+function longStamp(){ // Attempts to convert this: "Dec 13, 2024 (Fri) 23:00 (PST)"
+	var regex = /(\w+) (\d+), (\d+) \(\w+\) (\d+):(\d+) \((\w+)\)/g
+	
+	for(const element of allElements) {
+		const inner = element.innerHTML;
+		const result = regex.exec(inner);
+		if(!result) continue;
+		
+		const timestamp = buildLongTimestamp(result);
+		if(!timestamp) continue;
+		
+		
+		const converted = new Date(timestamp);
+		const replacement = buildReplacementLongTimestamp(converted);
 
-var allElements = document.getElementsByTagName("*");
-for(const element of allElements) {
-	const inner = element.innerHTML;
-	const result = regex.exec(inner);
-	if(!result) continue;
-	
-	const timestamp = buildTimestamp(result);
-	if(!timestamp) continue;
-	
-	
-	const converted = new Date(timestamp);
-	const replacement = buildReplacement(converted);
-
-	element.innerHTML = inner.replace(result[0], replacement);
-	// console.log(`Updated a timezone: ${result[0]} -> ${replacement}`);
+		element.innerHTML = inner.replace(result[0], replacement);
+		// console.log(`Updated a timezone: ${result[0]} -> ${replacement}`);
+	}
 }
+
+longStamp()
