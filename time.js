@@ -27,13 +27,16 @@ var shortMonths = [
 	'Nov', 'Dec'
 ];
 
-
-function buildLongTimestamp(result){
+/**
+ * @param {string[]} result
+ * @returns
+ */
+function buildFullTimestamp(result){
 	const [_full, month, date, year, hour, minute, zone] = result;
 	const triMonth = month.slice(0, 3);
 	
 	const monthNumber = shortMonths.indexOf(triMonth) + 1;
-	const offset = timezoneOffsets[zone];
+	const offset = timezoneOffsets[zone.toUpperCase()];
 	
 	const monthString = (monthNumber < 10) ? `0${monthNumber}` : monthNumber.toString();
 	const dateString = (date.length < 2) ? `0${date}` : date.toString();
@@ -50,7 +53,7 @@ function buildLongTimestamp(result){
 /**
  * @param {Date} dateTime
  */
-function buildReplacementLongTimestamp(dateTime){
+function buildReplacementFullTimestamp(dateTime){
 	const month = shortMonths[dateTime.getMonth()];
 	const date = dateTime.getDate();
 	const year = dateTime.getFullYear();
@@ -61,28 +64,30 @@ function buildReplacementLongTimestamp(dateTime){
 	var ts = new Date().toString();
 	var abrTimezone = /\((.*?)\)/.exec(ts)[0].match(/[A-Z]/g).join(""); // This is kinda ugly but it works. Not really any better solution.
 	
-	return `${month} ${date}, ${year} (${day}) ${(hour < 10) ? "0" + hour : hour}:${(minutes < 10) ? "0" + minutes : minutes} (${abrTimezone})`; // Add 0 in front of hours and minutes if under 10
+	return `${month} ${date}, ${year} (${day}) ${hour}:${(minutes < 10) ? "0" + minutes : minutes} (${abrTimezone})`; // Add 0 in front of hours and minutes if under 10
 }
 
 
-function longStamp(){ // Attempts to convert this: "Dec 13, 2024 (Fri) 23:00 (PST)"
-	var regex = /(\w+) (\d+), (\d+) \(\w+\) (\d+):(\d+) \((\w+)\)/g
+function fullStamp(){ // Attempts to convert this: "Dec 13, 2024 (Fri) 23:00 (PST)"
+	var regex = /(\w+) (\d+), (\d+)(?:\s\(\w+\)\s|,\s)(\d+):(\d+) \((\w+)\)/g
 	
 	for(const element of allElements) {
-		const inner = element.innerHTML;
-		const result = regex.exec(inner);
-		if(!result) continue;
-		
-		const timestamp = buildLongTimestamp(result);
-		if(!timestamp) continue;
-		
-		
-		const converted = new Date(timestamp);
-		const replacement = buildReplacementLongTimestamp(converted);
-
-		element.innerHTML = inner.replace(result[0], replacement);
-		// console.log(`Updated a timezone: ${result[0]} -> ${replacement}`);
+		element.childNodes.forEach(child => {
+			if(child.nodeType === Node.TEXT_NODE) {
+				const inner = child.nodeValue;
+				const result = regex.exec(inner);
+				if(!result) return;
+				
+				const timestamp = buildFullTimestamp(result);
+				if(!timestamp) return;
+				
+				const converted = new Date(timestamp);
+				const replacementTimestamp = buildReplacementFullTimestamp(converted);
+				
+				child.nodeValue = child.nodeValue.replace(result[0], replacementTimestamp)
+			}
+		})
 	}
 }
 
-longStamp()
+fullStamp()
