@@ -1,2 +1,2 @@
 # Black Desert Timestamp Conversion
-I got sick of trying to convert "pst" and "pdt" or whatever the fuck americans use.
+I got sick of trying to convert "pst" and "ptsd" or whatever the fuck americans use.
