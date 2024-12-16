@@ -1,10 +1,13 @@
 {
-	"manifest_version": 2,
+	"manifest_version": 3,
 	"name": "BDO Time Conversion",
-	"version": "1.0.5",
+	"version": "1.1",
 	
 	"icons": {
 		"48": "icons/48.png",
+		"54": "icons/54.png",
+		"79": "icons/79.png",
+		"92": "icons/92.png",
 		"96": "icons/96.png",
 		"256": "icons/256.png"
 	},
