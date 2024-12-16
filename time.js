@@ -54,7 +54,6 @@
 			const altMinuteString = (altMinute.length < 2) ? `0${altMinute}` : altMinute.toString();
 			
 			timestamps.push(`${year}-${monthString}-${dateString}T${althourString}:${altMinuteString}:00.000${offset}`);
-			console.log(timestamps);
 		}
 		
 		return timestamps;
